@@ -1,21 +1,10 @@
 #!/usr/bin/env bash
-# displays information about subdomains
-get_domain() {
+# World wide web
 
-
-    record=$(dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk '{printf "%s", $4}')
-    ip=$(dig "$2.$1" | grep -A1 'ANSWER SECTION:' | awk '{printf "%s", $5}')
-    printf "The subdomain %s is a %s record and points to %s\n" "$2" "$record" "$ip" 
-
-}
-
-
-
-if [ -z "$2" ]; then
-    for sub in "www" "lb-01" "web-01" "web-02"
-    do
-	get_domain "$1" "$sub"
-    done
+if [ $# -eq 1 ]; then
+    dom="www.$1 lb-01.$1 web-01.$1 web-02.$1"
 else
-    get_domain "$1" "$2"
+    dom="$2.$1"
 fi
+
+dig $dom | awk '/ANSWER SECTION:/{getline; split($1,b,"."); print "The subdomain", b[1], "is a", $4, "record and points to", $5}'
